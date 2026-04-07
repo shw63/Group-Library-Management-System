@@ -1,5 +1,81 @@
 <!DOCTYPE html>
-<html>
-  <head></head>
-  <body></body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="script.js"></script>
+</head>
+<body>
+
+    <header>
+        <h1>Library Management System</h1>
+    </header>
+
+    <!-- Dashboard -->
+    <section id="dashboard">
+        <h2>Library Dashboard</h2>
+        <!-- container for the book stats -->
+        <div class="stats">
+            <!-- number of total books, borrowed books, and overdue books -->
+            <p id="totalBooks">Total Books: 0</p>
+            <p id="borrowedCount">Borrowed Books: 0</p>
+            <p id="overdueCount">Overdue Books: 0</p>
+        </div>
+    </section>
+
+    <!-- Search and Sort controls -->
+    <section id="controls">
+        <h2>Browse Books</h2>
+
+        <!-- User input here to dynamically filter books -->
+        <input type="text" id="searchBar" placeholder="Search by title, author, or genre">
+
+        <!-- Sorting Dropdown -->
+        <!-- JS provides detection for selected option and sorts -->
+        <select id="sortSelect">
+            <!-- Sorting options for title, author, or genre -->
+            <option value="title">Sort by Title</option>
+            <option value="author">Sort by Author</option>
+            <option value="genre">Sort by Genre</option>
+        </select>
+    </section>
+
+    <!-- Book List -->
+    <section id="bookSection">
+        <h2>Available Books</h2>
+        <!-- Container where JS will insert books dynamically -->
+        <div id="bookList"></div>
+
+        <!-- possible structure for the book cards (FOR SHEA) -->
+        <!--
+        <div class="book-card">
+            <h3>Book Title</h3>
+            <p>Author Name</p>
+            <p>Genre</p>
+            <button>Borrow</button>
+        </div>
+        -->
+
+
+    </section>
+
+    <!-- Borrowed Books -->
+    <section id="borrowedSection">
+        <h2>Borrowed Books</h2>
+        <!-- Container for borrowed books to be displayed -->
+        <div id="borrowedBooks"></div>
+
+        <!-- possible structure again -->
+        <!--
+        <div class="book-card borrowed">
+            <h3>Book Title</h3>
+            <p>Due Date: 2026-04-20</p>
+            <button>Return</button>
+        </div>
+        -->
+
+    </section>
+
+</body>
 </html>
