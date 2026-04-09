@@ -7,6 +7,7 @@ const collectionTitles = ["El Señor de los Anillos", "Dioses Menores", "Pilgrim
 
 const collectionAuthors = ["David Eddings", "Terry Pratchett", "Brad Land", "Catherine Coulter", "Catherine Coulter", "Catherine Coulter", "John Vornholt", "Johanna Lindsey", "Sheri S. Tepper", "Frank Roderus", "Dick Francis", "Dean Koontz", "Timothy Zahn", "Dick Francis", "Len Riley", "Mons Kallentoft", "Elizabeth Scarborough", "Wendy Markham", "Guy Saville", "Loren D. Estleman", "Austin Grossman", "Lawrence Sanders", "Denise Mina", "Tim Dorsey", "Elizabeth Lowell", "Mons Kallentoft", "L. P. Holmes", "Katherine Page", "Terry Brooks", "Stephen Horn", "Dean Koontz", "Rob Rickards", "Barbara Parker", "Mary Davidson", "Susan Albert", "Chris Ewan", "Andrew Taylor", "Byron Preiss", "John Minahan", "Sheri S. Tepper", "Jennifer Egan", "Polly Williams", "Michael Harvey", "Bill Pronzini", "John Reese", "Harry Turtledove", "Kieran Shields", "Bill Napier", "Kimberla Roby", "Christopher Fowler"];
 
+// S-F = Sci-Fi, W = Western, M = Mystery, F = general fiction
 const collectionGenres = [
   "S-F", "S-F", "F", "F", "F", "F", "S-F", "F", "F", "S-F", 
   "W", "M", "F", "S-F", "M", "F", "M", "S-F", "F", "F", 
@@ -56,6 +57,18 @@ window.addEventListener("load", function() {
     // redraw our browse array once sort finished
     redrawBookArray(browse, browseDiv);
     });
+
+    // event listener for "borrow" button clicked
+
+    const borrowButtons = document.querySelectorAll('.borrow');
+
+        // Loop through each button to add a listener
+    borrowButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            console.log(`clicked to borrow book: ${event.target.value}`);
+        });
+    });
+
 });
 
 
@@ -111,6 +124,8 @@ function redrawBookArray(bookArray, parentRowDiv) {
     // create new button
     var borrowButton = document.createElement('button');
     borrowButton.textContent = "Borrow";
+    borrowButton.value = `${isbn}`;
+    borrowButton.classList.add('borrow');
 
     // set card to auto fit size to screen
     bookCol.classList.add('col', 'col-auto');
