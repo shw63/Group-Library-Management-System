@@ -85,6 +85,9 @@ function redrawBookArray(bookArray, parentRowDiv) {
 
     // for each isbn in the book array (row 0 is isbn #s)
     bookArray[0].forEach((isbn, i) => {
+        // create column wrapper
+    var bookCol = document.createElement('div');
+
         // create a new image
     var img = document.createElement('img');
         // pull cover png from openlibrary.org
@@ -104,20 +107,20 @@ function redrawBookArray(bookArray, parentRowDiv) {
 
     // create a new bootstrap card
     var cardDiv = document.createElement('div');
-    cardDiv.classList.add('card');
+    cardDiv.classList.add('card', 'w-100' ,'h-100', 'shadow-sm');
     // create a div for title text
-    var titleDiv = document.createElement('div');
+    var titleDiv = document.createElement('h5');
     // add the genre and title at current i index
     titleDiv.textContent = (`${bookArray[3][i]}  ${bookArray[1][i]}`)
     // add class so we can access this object easily in future
-    titleDiv.classList.add('book_title');
-
+    titleDiv.classList.add('book_title', 'card-title');
     // create a div for author text
-    var authorDiv = document.createElement('div');
-    authorDiv.classList.add('book_author');
+    var authorDiv = document.createElement('p');
+    authorDiv.classList.add('book_author', 'card-text', 'text-muted');
     // add author at current i index
     authorDiv.textContent = (`${bookArray[2][i]}`)
-
+    var cardBody = document.createElement('div');
+    cardBody.classList.add('card-body', 'd-flex', 'flex-column', 'text-center');
     // create new bootstrap column
     var bookCol = document.createElement('div');
 
@@ -125,10 +128,11 @@ function redrawBookArray(bookArray, parentRowDiv) {
     var borrowButton = document.createElement('button');
     borrowButton.textContent = "Borrow";
     borrowButton.value = `${isbn}`;
-    borrowButton.classList.add('borrow');
+    borrowButton.classList.add('borrow', 'btn', 'btn-primary', 'mt-auto');
 
     // set card to auto fit size to screen
-    bookCol.classList.add('col', 'col-auto');
+    //bookCol.classList.add('col', 'col-auto');
+    bookCol.classList.add('col-12', 'col-md-4', 'col-lg-3', 'mb-4');
 
     // append objects to create card
     cardDiv.appendChild(img);
@@ -162,3 +166,14 @@ function sortCollection(collectionArray, optionIndex) {
     collectionArray[2] = indices.map(i => collectionArray[2][i]);
     collectionArray[3] = indices.map(i => collectionArray[3][i]); 
 }
+
+// function to update stats page
+function updateStats()
+{
+    var bookTotal = document.querySelector('#totalBooks');
+    var borrowedTotal = document.querySelector('#borrowedCount');
+    var overDueTotal = document.querySelector('#overdueCount');
+
+    bookTotal.textContent = "Total Books: " + collection[0].length;
+}
+updateStats();

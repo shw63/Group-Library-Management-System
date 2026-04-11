@@ -1,4 +1,39 @@
-.card
+.card-body
 {
     margin-top: 25px;
 }
+
+.card {
+    background-color: beige;
+    border-radius: 20px;
+}
+
+.borrow {
+    border-radius: 10px;
+}
+
+.book_title, .book_author {
+    padding-left: 15px;
+}
+
+.book_title {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.browse-wrapper {
+    border: 1px solid lightgrey;
+}
+
+#searchBar {
+    border-radius: 10px;
+    border: 1px solid lightgray;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#sortSelect {
+    border-radius: 10px;
+    border: 2px solid lightgrey;
+}
+
