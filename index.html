@@ -21,15 +21,18 @@
                 <div class="col px-4">
                     
                     <!-- Search and Sort controls--> 
-                    <section id="controls">
+                    <section id="controls" aria-label="Book search and sorting">
                         <h2 class="h5">Browse Books</h2>
                         <div class="input-group input-group-lg">
                             <!-- User input here to dynamically filter books -->
+                            <!-- Search -->
+                            <label for="searchBar" class="visually-hidden">Search Books</label>
                             <input type="text" id="searchBar" class="form-control" placeholder="Search by title, author, or genre">
 
                             <!-- Sorting Dropdown -->
                             <!-- JS provides detection for selected option and sorts -->
-                            <select id="sortSelect">
+                            <label for="sortSelect" class="visually-hidden">Sort Books</label>
+                            <select id="sortSelect" class="form-select">
                                 <!-- Sorting options for title, author, or genre -->
                                 <option value="title">Sort by Title</option>
                                 <option value="author">Sort by Author</option>
@@ -48,9 +51,9 @@
                         <!-- container for the book stats -->
                         <div class="stats">
                             <!-- number of total books, borrowed books, and overdue books -->
-                            <p id="totalBooks">Total Books: 0</p>
-                            <p id="borrowedCount">Borrowed Books: 0</p>
-                            <p id="overdueCount">Overdue Books: 0</p>
+                            <p id="totalBooks">Total Books: <span>0</span></p>
+                            <p id="borrowedCount">Borrowed Books: <span>0</span></p>
+                            <p id="overdueCount">Overdue Books: <span>0</span></p>
                         </div>
                     </section>
 
@@ -63,7 +66,7 @@
 
     
 
-    
+    <!-- Main Content --> 
     <main class="container">
         <!-- Book List -->
         <section id="bookSection" class="browse-wrapper p-5 rounded-4 shadow-sm mb-5">
@@ -72,7 +75,6 @@
             <div id="bookList">
                 <div class = "container">
                     <div class = "row browseRow">
-
                     </div>
                 </div>
             </div>
@@ -86,33 +88,40 @@
                 <button>Borrow</button>
             </div>
             -->
-
-
         </section>
+
+
 
         <!-- Borrowed Books -->
-        <section id="borrowedSection">
-            <h2>Borrowed Books</h2>
+        <section id="borrowedSection" aria-live="polite" aria-label="Borrowed books section">
+            <h2 class="mb-4">Borrowed Books</h2>
             <!-- Container for borrowed books to be displayed -->
-            <div id="borrowedBooks">
-                <div class = "container">
-                    <div class = "row borrowedfRow">
-
-                    </div>
+            <div class="container">
+                <!-- JS will insert cards here -->
+                <div class="row borrowedRow" id="borrowedRow">
                 </div>
-            </div>
-            </div>
 
-            <!-- possible structure again -->
-            <!--
-            <div class="book-card borrowed">
-                <h3>Book Title</h3>
-                <p>Due Date: 2026-04-20</p>
-                <button>Return</button>
+                    <!-- possible structure again -->
+                    <!--
+                    <div class="book-card borrowed">
+                        <h3>Book Title</h3>
+                        <p>Author Name</p>
+                        <p class="due-date">
+                            Due Date: <span>2024-06-30</span>
+                        </p>
+
+                        <p class="overdue-label">Overdue</p>
+
+                        <button class="returnBtn">
+                            Return
+                        </button>
+                    </div>                
+                    -->
+
             </div>
-            -->
 
         </section>
+        
     </main>
 <!-- bootstrap include -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
