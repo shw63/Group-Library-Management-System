@@ -1,3 +1,5 @@
+var currentSortOption = 1;
+
 
 
 // declare arrays for book info
@@ -16,14 +18,18 @@ const collectionGenres = [
   "F", "F", "M", "M", "W", "S-F", "M", "M", "F", "M"
 ];
 
+
 const collection = [collectionISBNs, collectionTitles, collectionAuthors, collectionGenres];
 
 // The results in browse section will default to entire collection
-const browseISBNs = collectionISBNs;
-const browseTitles = collectionTitles;
-const browseAuthors = collectionAuthors;
-const browseGenres = collectionGenres;
-const browse = [browseISBNs, browseTitles, browseAuthors, browseGenres];
+const browseISBNs = [...collectionISBNs]; 
+const browseTitles = [...collectionTitles];
+const browseAuthors = [...collectionAuthors];
+const browseGenres = [...collectionGenres];
+const browseCheckedOut = [];
+collectionISBNs.forEach(() => browseCheckedOut.push(0));
+var checkoutRow = 4;
+const browse = [browseISBNs, browseTitles, browseAuthors, browseGenres, browseCheckedOut];
 
 // borrowed starts out empty
 const borrowedISBNs = [];
@@ -32,44 +38,104 @@ const borrowedAuthors = [];
 const borrowedGenres = [];
 const borrowed = [borrowedISBNs, borrowedTitles, borrowedAuthors, borrowedGenres];
 
-// actions to be carried out only once page loads
-window.addEventListener("load", function() {
-    // set up object to track the div where browse books cards are drawn
-    const browseDiv = document.querySelector(".browseRow");
-    // set up object to track where borrowed books cards are drawn
-    const borrowedDiv = document.querySelector(".borrowedRow");
-    // draw browse book cards on page load
-        // function redrawBookArray below
-    redrawBookArray(collection, browseDiv);
+const currentlyCheckedOut = [];
 
-    // event listener for when sort selection updated
-    const sortOption = document.querySelector('#sortSelect');
-    sortOption.addEventListener('change', (event) => {
-    const choice = event.target.value;
+
+
+const BORROWED_KEY = 'borrowedStorageArray'; 
+
+
+// Try to Load array of borrowed book from local storage
+// If it does not exist, load an empty array
+// borrowedISBNs = JSON.parse(localStorage.getItem(BORROWED_KEY_KEY)) || [];
+
+
+// set up object to track the div where browse books cards are drawn
+const browseDiv = document.querySelector(".browseRow");
+// set up object to track where borrowed books cards are drawn
+const borrowedDiv = document.querySelector(".borrowedRow");
+
+
+// perform initial sort by title on page load
+    // sortCollection defined below
+sortCollection(browse, currentSortOption);
+// draw browse book cards on page load
+    // redrawBookArray defined below
+redrawBookArray(browse, browseDiv);
+
+// event listener for when sort selection updated
+const sortOption = document.querySelector('#sortSelect');
+sortOption.addEventListener('change', (event) => {
+    var choice = event.target.value;
+
     // call sort function based on chosen option
     if (choice === "author") {
-        sortCollection(browse, 2); 
+        currentSortOption = 2; 
     } else if (choice === "title") {
-        sortCollection(browse, 1); 
+        currentSortOption = 1;
     } else if (choice === "genre") {
-        sortCollection(browse, 3);
+        currentSortOption = 3;
     }
+    sortCollection(browse, currentSortOption);
     // redraw our browse array once sort finished
     redrawBookArray(browse, browseDiv);
-    });
-
-    // event listener for "borrow" button clicked
-
-    const borrowButtons = document.querySelectorAll('.borrow');
-
-        // Loop through each button to add a listener
-    borrowButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            console.log(`clicked to borrow book: ${event.target.value}`);
-        });
-    });
-
 });
+
+
+
+// event listener for browse container
+browseDiv.addEventListener('click', (event) => {
+
+    // Check if what was clicked is actually a borrow button
+    if(event.target.classList.contains('borrow')) {
+        const button = event.target;
+        var index = button.dataset.arrayLocation;
+        
+        // Check if the book is not checked out (value 0)
+        if(browse[checkoutRow][index] === 0) {
+            
+            // Update the status to checked out (1)
+            browse[checkoutRow][index] = 1;
+            
+            // Add to borrowed array and refresh the UI
+            addToBorrowed(button, borrowed);       
+            redrawBookArray(borrowed, borrowedDiv);
+            redrawBookArray(browse, browseDiv);
+
+        }
+    }
+});
+
+// event listener for return button clicked
+borrowedDiv.addEventListener('click', (event) => {
+    // Check if what was clicked is actually a borrow button
+    if(event.target.classList.contains('borrow')) {
+        console.log(`tried to return ${event.target}`)
+        var button = event.target;
+        var index = button.dataset.arrayLocation;
+        
+
+            
+        returnBook(event.target, browse);
+        redrawBookArray(borrowed, borrowedDiv);
+        redrawBookArray(browse, browseDiv);
+
+    }
+});
+
+// function to update stats page
+function updateStats()
+{
+    var bookTotal = document.querySelector('#totalBooks');
+    var borrowedTotal = document.querySelector('#borrowedCount');
+    var overDueTotal = document.querySelector('#overdueCount');
+
+    bookTotal.textContent = "Total Books: " + collection[0].length;
+    borrowedTotal.textContent = "Borrowed Books: " + borrowed[0].length;
+}
+// call once on page load 
+updateStats();
+
 
 
 
@@ -85,9 +151,6 @@ function redrawBookArray(bookArray, parentRowDiv) {
 
     // for each isbn in the book array (row 0 is isbn #s)
     bookArray[0].forEach((isbn, i) => {
-        // create column wrapper
-    var bookCol = document.createElement('div');
-
         // create a new image
     var img = document.createElement('img');
         // pull cover png from openlibrary.org
@@ -114,11 +177,13 @@ function redrawBookArray(bookArray, parentRowDiv) {
     titleDiv.textContent = (`${bookArray[3][i]}  ${bookArray[1][i]}`)
     // add class so we can access this object easily in future
     titleDiv.classList.add('book_title', 'card-title');
+
     // create a div for author text
     var authorDiv = document.createElement('p');
     authorDiv.classList.add('book_author', 'card-text', 'text-muted');
     // add author at current i index
     authorDiv.textContent = (`${bookArray[2][i]}`)
+
     var cardBody = document.createElement('div');
     cardBody.classList.add('card-body', 'd-flex', 'flex-column', 'text-center');
     // create new bootstrap column
@@ -126,12 +191,42 @@ function redrawBookArray(bookArray, parentRowDiv) {
 
     // create new button
     var borrowButton = document.createElement('button');
-    borrowButton.textContent = "Borrow";
-    borrowButton.value = `${isbn}`;
+    borrowButton.value = isbn;
+    borrowButton.dataset.isbn = `${isbn}`;
+    borrowButton.dataset.bookTitle = `${bookArray[1][i]}`;
+    borrowButton.dataset.genre = `${bookArray[3][i]}`;
+    borrowButton.dataset.author = `${bookArray[2][i]}`;
+    borrowButton.dataset.arrayLocation = i;
+    borrowButton.myCard = cardDiv;
     borrowButton.classList.add('borrow', 'btn', 'btn-primary', 'mt-auto');
 
+    // check borrowed status
+    if(bookArray === browse)
+    {
+        if(bookArray[checkoutRow][i] === undefined)
+        {
+            bookArray[checkoutRow][i] = 0;
+            borrowButton.innerText = "Borrow";
+        }
+        else if(bookArray[checkoutRow][i] === 1)
+        {
+            borrowButton.innerText = "Checked Out";
+            borrowButton.style.backgroundColor = "red";
+        }
+        else
+        {
+            borrowButton.innerText = "Borrow";
+            borrowButton.style.backgroundColor = "";
+        }
+    }
+    if(bookArray === borrowed)
+    {
+        borrowButton.innerText = "Return";
+    }
+
+
     // set card to auto fit size to screen
-    //bookCol.classList.add('col', 'col-auto');
+    bookCol.classList.add('col', 'col-auto');
     bookCol.classList.add('col-12', 'col-md-4', 'col-lg-3', 'mb-4');
 
     // append objects to create card
@@ -143,6 +238,7 @@ function redrawBookArray(bookArray, parentRowDiv) {
     parentRowDiv.appendChild(bookCol);
 
     });
+    updateStats(); // Added to keep stats in sync
 }
 
 
@@ -165,15 +261,48 @@ function sortCollection(collectionArray, optionIndex) {
     collectionArray[1] = indices.map(i => collectionArray[1][i]); 
     collectionArray[2] = indices.map(i => collectionArray[2][i]);
     collectionArray[3] = indices.map(i => collectionArray[3][i]); 
+    if(collectionArray === browse)
+    {
+      collectionArray[4] = indices.map(i => collectionArray[4][i]);   
+    }
 }
 
-// function to update stats page
-function updateStats()
+
+
+// function to add an ISBN to borrowed books when borrow button clicked
+function addToBorrowed(buttonClicked, destArray)
 {
-    var bookTotal = document.querySelector('#totalBooks');
-    var borrowedTotal = document.querySelector('#borrowedCount');
-    var overDueTotal = document.querySelector('#overdueCount');
-
-    bookTotal.textContent = "Total Books: " + collection[0].length;
+    var alreadyBorrowed = 0;
+    destArray[0].forEach((isbn, i) => {
+        if(isbn === buttonClicked.dataset.isbn)
+        {
+            alreadyBorrowed = 1;
+        }
+    });
+    if(alreadyBorrowed === 0)
+    {
+        destArray[0].push(buttonClicked.dataset.isbn);
+        destArray[1].push(buttonClicked.dataset.bookTitle);
+        destArray[2].push(buttonClicked.dataset.author);
+        browse[checkoutRow][buttonClicked.dataset.arrayLocation] = 1;
+        
+    }  
 }
-updateStats();
+
+// function to return a book
+function returnBook(buttonClicked, destArray)
+{
+    var browseIndex = browse[0].indexOf(buttonClicked.dataset.isbn);
+    browse[checkoutRow][browseIndex] = 0;
+
+    sortCollection(browse, currentSortOption);
+    var returnIndex = borrowed[0].indexOf(buttonClicked.dataset.isbn);
+    borrowed[0].splice(returnIndex, 1); // ISBNs
+    borrowed[1].splice(returnIndex, 1); // Titles
+    borrowed[2].splice(returnIndex, 1); // Authors
+    borrowed[3].splice(returnIndex, 1); // Genres
+
+ 
+
+}
+
