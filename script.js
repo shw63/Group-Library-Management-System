@@ -81,8 +81,36 @@ sortOption.addEventListener('change', (event) => {
     redrawBookArray(browse, browseDiv);
 });
 
+// event listener for searchbar updated
+searchBar.addEventListener('input', (event) => {
+    // make search matching case insensitive
+    const currentText = event.target.value.toLowerCase();
+    // select all cards in browseDiv
+    const browseDivCards = browseDiv.querySelectorAll('.card');
+    // loop through each card
+    browseDivCards.forEach(card => {
+        const bookTitle = card.querySelector('.book_title');
+        // find all book title divs
+        if(bookTitle){
+            // convert title to lowercase
+            var titleText = bookTitle.textContent.toLowerCase();
+            
+            // Determine if card should be displayed
+            var displayCard = titleText.includes(currentText);
 
-
+            // target the col the card is contained in
+            const container = card.closest('.col'); 
+            // choose whether to show or hide card
+            if(displayCard){
+                // force card to show up again when it matches search
+                container.style.display = "";      
+            } else {
+                // hide card if not matches search
+                container.style.display = "none";    
+            }
+        }
+    });
+});
 // event listener for browse container
 browseDiv.addEventListener('click', (event) => {
 
@@ -237,8 +265,12 @@ function redrawBookArray(bookArray, parentRowDiv) {
     bookCol.appendChild(cardDiv);
     parentRowDiv.appendChild(bookCol);
 
-    });
-    updateStats(); // Added to keep stats in sync
+    }); 
+
+    // ensure filtering is applied when books redrawn
+    searchBar.dispatchEvent(new Event('input'));
+    // keep stats in sync
+    updateStats(); 
 }
 
 
