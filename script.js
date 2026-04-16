@@ -1,3 +1,4 @@
+
 var currentSortOption = 1;
 
 
@@ -45,23 +46,22 @@ const currentlyCheckedOut = [];
 const BORROWED_KEY = 'borrowedStorageArray'; 
 
 
-// Try to Load array of borrowed book from local storage
-// If it does not exist, load an empty array
-// borrowedISBNs = JSON.parse(localStorage.getItem(BORROWED_KEY_KEY)) || [];
-
 
 // set up object to track the div where browse books cards are drawn
 const browseDiv = document.querySelector(".browseRow");
 // set up object to track where borrowed books cards are drawn
 const borrowedDiv = document.querySelector(".borrowedRow");
 
-
+// load borowed books from storage
+loadBorrowedBooks();
 // perform initial sort by title on page load
     // sortCollection defined below
 sortCollection(browse, currentSortOption);
 // draw browse book cards on page load
     // redrawBookArray defined below
 redrawBookArray(browse, browseDiv);
+redrawBookArray(borrowed, borrowedDiv);
+
 
 // event listener for when sort selection updated
 const sortOption = document.querySelector('#sortSelect');
@@ -104,8 +104,9 @@ searchBar.addEventListener('input', (event) => {
             if(displayCard){
                 // force card to show up again when it matches search
                 container.style.display = "";      
-            } else {
-                // hide card if not matches search
+            } 
+            else {
+                // hide card if it doesn't match search
                 container.style.display = "none";    
             }
         }
@@ -271,6 +272,7 @@ function redrawBookArray(bookArray, parentRowDiv) {
     searchBar.dispatchEvent(new Event('input'));
     // keep stats in sync
     updateStats(); 
+    
 }
 
 
@@ -280,8 +282,11 @@ function redrawBookArray(bookArray, parentRowDiv) {
     // array.sort moves the values around based on the result of localeCompare
     // array.map creates an array numbered 0-number of books storing integers instead of author/genre/title so they can be moved around easily
 function sortCollection(collectionArray, optionIndex) {
+    // create an array same size as our array
+    // but values are the indexes themselves
     let indices = collectionArray[0].map((_, i) => i);
-
+    // sort using index at a and b converted to lowercase
+    // row is the sorting option chosen
     indices.sort((a, b) => {
         let valA = (collectionArray[optionIndex][a]).toLowerCase();
         let valB = (collectionArray[optionIndex][b]).toLowerCase();
@@ -305,36 +310,81 @@ function sortCollection(collectionArray, optionIndex) {
 function addToBorrowed(buttonClicked, destArray)
 {
     var alreadyBorrowed = 0;
+    // check if book already in borrowed array
     destArray[0].forEach((isbn, i) => {
         if(isbn === buttonClicked.dataset.isbn)
         {
+            // if found, set already borrowed to true
             alreadyBorrowed = 1;
         }
     });
+    // if it isn't already borrowed
     if(alreadyBorrowed === 0)
     {
+        // push book array contents to borrowed array
         destArray[0].push(buttonClicked.dataset.isbn);
         destArray[1].push(buttonClicked.dataset.bookTitle);
         destArray[2].push(buttonClicked.dataset.author);
-        browse[checkoutRow][buttonClicked.dataset.arrayLocation] = 1;
-        
+
+        // set the checkout status in browse array to 1, indicating checked out
+        browse[checkoutRow][buttonClicked.dataset.arrayLocation] = 1;     
     }  
+    // save updated borrowed to local storage
+    saveBorrowedBooks();
 }
 
 // function to return a book
 function returnBook(buttonClicked, destArray)
 {
+    // get index in browse array of current book
     var browseIndex = browse[0].indexOf(buttonClicked.dataset.isbn);
+    // set checkout status to 0, indicating not checked out
     browse[checkoutRow][browseIndex] = 0;
+    
 
-    sortCollection(browse, currentSortOption);
+    // get the array index of current book
     var returnIndex = borrowed[0].indexOf(buttonClicked.dataset.isbn);
-    borrowed[0].splice(returnIndex, 1); // ISBNs
-    borrowed[1].splice(returnIndex, 1); // Titles
-    borrowed[2].splice(returnIndex, 1); // Authors
-    borrowed[3].splice(returnIndex, 1); // Genres
+    // remove book from "borrowed" array in each row using splice
+    borrowed[0].splice(returnIndex, 1); 
+    borrowed[1].splice(returnIndex, 1); 
+    borrowed[2].splice(returnIndex, 1); 
+    borrowed[3].splice(returnIndex, 1); 
 
- 
+    // save updated borrowed to local storage
+    saveBorrowedBooks();
 
 }
 
+// function to save current borrowed book info
+function saveBorrowedBooks() {
+    localStorage.setItem(BORROWED_KEY, JSON.stringify(borrowed));
+}
+
+
+// function to load borrowed book info
+function loadBorrowedBooks() {
+    // load string version of borrowed books from local storage
+    const borrowedString = localStorage.getItem(BORROWED_KEY);
+    // if the string existed (borrowed books were saved in storage)
+    if(borrowedString)
+    {
+        // convert string to array
+        const borrowedArray = JSON.parse(borrowedString);
+        
+        // Clear current arrays and push loaded data back in
+        for(var i = 0; i < borrowedArray.length; i++) {
+            // clear current borrowed array
+            borrowed[i].length = 0;
+            // push saved ISBN, title, author, genre arrays
+            borrowed[i].push(...borrowedArray[i]); 
+        }
+
+        // Synchronize borrow buttons so they don't show as checked out in browse div
+        borrowed[0].forEach((isbn, i) => {
+            // find index of this isbn in the browse array
+            var location = browse[0].indexOf(isbn);
+            // set checkout status at index to 1 for checked out
+            browse[checkoutRow][location] = 1;
+        });
+    }
+}
