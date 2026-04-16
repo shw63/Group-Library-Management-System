@@ -37,7 +37,8 @@ const borrowedISBNs = [];
 const borrowedTitles = [];
 const borrowedAuthors = [];
 const borrowedGenres = [];
-const borrowed = [borrowedISBNs, borrowedTitles, borrowedAuthors, borrowedGenres];
+const borrowedDueDate = [];
+const borrowed = [borrowedISBNs, borrowedTitles, borrowedAuthors, borrowedGenres, borrowedDueDate];
 
 const currentlyCheckedOut = [];
 
@@ -158,9 +159,25 @@ function updateStats()
     var bookTotal = document.querySelector('#totalBooks');
     var borrowedTotal = document.querySelector('#borrowedCount');
     var overDueTotal = document.querySelector('#overdueCount');
+    var totalOverdue = 0;
+    // set a date to todays date for comparison
+    var today = new Date();
+    // loop through each borrowed book
+    borrowedDueDate.forEach((date) =>{
+        // get due date
+        checkDate = new Date(date);
+        // if book overdue
+        if(today > checkDate)
+        {  
+            // increment overdue counter
+            totalOverdue++;
+        }
+    });
 
+    // update text content of tracking divs
     bookTotal.textContent = "Total Books: " + collection[0].length;
     borrowedTotal.textContent = "Borrowed Books: " + borrowed[0].length;
+    overDueTotal.textContent = "Overdue Books: " + totalOverdue;
 }
 // call once on page load 
 updateStats();
@@ -180,91 +197,111 @@ function redrawBookArray(bookArray, parentRowDiv) {
 
     // for each isbn in the book array (row 0 is isbn #s)
     bookArray[0].forEach((isbn, i) => {
-        // create a new image
-    var img = document.createElement('img');
-        // pull cover png from openlibrary.org
-    img.src = `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg?default=false`;
-    
-    // if no cover for this isbn found, use default
-    img.onerror = function() {
-        this.src = './no_cover.png'; 
-    };
+            // create a new image
+        var img = document.createElement('img');
+            // pull cover png from openlibrary.org
+        img.src = `https://covers.openlibrary.org/b/isbn/${isbn}-M.jpg?default=false`;
+        
+        // if no cover for this isbn found, use default
+        img.onerror = function() {
+            this.src = './no_cover.png'; 
+        };
 
-    // set alt text for cover
-    img.alt = `Book cover for ISBN ${isbn}`;
-    // set cover image dimentions
-    img.style.height = "150px";
-    img.style.width = "auto"; 
-    img.style.objectFit = "contain";
+        // set alt text for cover
+        img.alt = `Book cover for ISBN ${isbn}`;
+        // set cover image dimentions
+        img.style.height = "150px";
+        img.style.width = "auto"; 
+        img.style.objectFit = "contain";
 
-    // create a new bootstrap card
-    var cardDiv = document.createElement('div');
-    cardDiv.classList.add('card', 'w-100' ,'h-100', 'shadow-sm');
-    // create a div for title text
-    var titleDiv = document.createElement('h5');
-    // add the genre and title at current i index
-    titleDiv.textContent = (`${bookArray[3][i]}  ${bookArray[1][i]}`)
-    // add class so we can access this object easily in future
-    titleDiv.classList.add('book_title', 'card-title');
+        // create a new bootstrap card
+        var cardDiv = document.createElement('div');
+        cardDiv.classList.add('card', 'w-100' ,'h-100', 'shadow-sm');
+        // create a div for title text
+        var titleDiv = document.createElement('h5');
+        // add the genre and title at current i index
+        titleDiv.textContent = (`${bookArray[3][i]}  ${bookArray[1][i]}`)
+        // add class so we can access this object easily in future
+        titleDiv.classList.add('book_title', 'card-title');
 
-    // create a div for author text
-    var authorDiv = document.createElement('p');
-    authorDiv.classList.add('book_author', 'card-text', 'text-muted');
-    // add author at current i index
-    authorDiv.textContent = (`${bookArray[2][i]}`)
+        // create a div for author text
+        var authorDiv = document.createElement('p');
+        authorDiv.classList.add('book_author', 'card-text', 'text-muted');
+        // add author at current i index
+        authorDiv.textContent = (`${bookArray[2][i]}`)
 
-    var cardBody = document.createElement('div');
-    cardBody.classList.add('card-body', 'd-flex', 'flex-column', 'text-center');
-    // create new bootstrap column
-    var bookCol = document.createElement('div');
+        var cardBody = document.createElement('div');
+        cardBody.classList.add('card-body', 'd-flex', 'flex-column', 'text-center');
+        // create new bootstrap column
+        var bookCol = document.createElement('div');
 
-    // create new button
-    var borrowButton = document.createElement('button');
-    borrowButton.value = isbn;
-    borrowButton.dataset.isbn = `${isbn}`;
-    borrowButton.dataset.bookTitle = `${bookArray[1][i]}`;
-    borrowButton.dataset.genre = `${bookArray[3][i]}`;
-    borrowButton.dataset.author = `${bookArray[2][i]}`;
-    borrowButton.dataset.arrayLocation = i;
-    borrowButton.myCard = cardDiv;
-    borrowButton.classList.add('borrow', 'btn', 'btn-primary', 'mt-auto');
+        // create new button
+        var borrowButton = document.createElement('button');
+        // set up attributes for button to store
 
-    // check borrowed status
-    if(bookArray === browse)
-    {
-        if(bookArray[checkoutRow][i] === undefined)
+        // I set the value and a separate dataset to isbn
+        // I don't remember if both are used anymore
+        borrowButton.value = isbn;
+        borrowButton.dataset.isbn = `${isbn}`;
+        // 1 = title row, 2 = author row, 3 = genre row
+        borrowButton.dataset.bookTitle = `${bookArray[1][i]}`;
+        borrowButton.dataset.genre = `${bookArray[3][i]}`;
+        borrowButton.dataset.author = `${bookArray[2][i]}`;
+        borrowButton.dataset.arrayLocation = i;
+        borrowButton.myCard = cardDiv;
+        // add classes to button for later use/styling
+        borrowButton.classList.add('borrow', 'btn', 'btn-primary', 'mt-auto');
+
+        // if the array we are drawing is the browe array
+        if(bookArray === browse)
         {
-            bookArray[checkoutRow][i] = 0;
-            borrowButton.innerText = "Borrow";
+            // if the book is checked out
+            if(bookArray[checkoutRow][i] === 1)
+            {
+                // style for checkout
+                borrowButton.innerText = "Checked Out";
+                borrowButton.style.backgroundColor = "red";
+            }
+            else
+            {
+                // style for on shelf
+                borrowButton.innerText = "Borrow";
+                borrowButton.style.backgroundColor = "";
+            }
         }
-        else if(bookArray[checkoutRow][i] === 1)
+        // if the array being drawn is borrowed books
+        if(bookArray === borrowed)
         {
-            borrowButton.innerText = "Checked Out";
-            borrowButton.style.backgroundColor = "red";
+
+            borrowButton.innerText = "Return";
+            // format due date and check for overdue
+            var dueDateDiv = document.createElement('div');
+            var returByDate = new Date(borrowed[4][i]);
+            dueDateDiv.innerText = `Due Date: ${returByDate.toLocaleDateString('en-US')}`;
+            var today = new Date();
+            // if book overdue
+            if(today > returByDate){
+            dueDateDiv.style.color = "red";
+            dueDateDiv.style.fontWeight = "bold";
+            }
         }
-        else
-        {
-            borrowButton.innerText = "Borrow";
-            borrowButton.style.backgroundColor = "";
-        }
-    }
-    if(bookArray === borrowed)
-    {
-        borrowButton.innerText = "Return";
-    }
 
 
-    // set card to auto fit size to screen
-    bookCol.classList.add('col', 'col-auto');
-    bookCol.classList.add('col-12', 'col-md-4', 'col-lg-3', 'mb-4');
+        // set card to auto fit size to screen
+        bookCol.classList.add('col', 'col-auto');
+        bookCol.classList.add('col-12', 'col-md-4', 'col-lg-3', 'mb-4');
 
-    // append objects to create card
-    cardDiv.appendChild(img);
-    cardDiv.appendChild(titleDiv);
-    cardDiv.appendChild(authorDiv);
-    cardDiv.appendChild(borrowButton);
-    bookCol.appendChild(cardDiv);
-    parentRowDiv.appendChild(bookCol);
+        // append objects to create card
+        cardDiv.appendChild(img);
+        cardDiv.appendChild(titleDiv);
+        cardDiv.appendChild(authorDiv);
+        // only attempt to append due date if drawing borrowed array
+        if(bookArray === borrowed)
+        {cardDiv.appendChild(dueDateDiv);}
+        
+        cardDiv.appendChild(borrowButton);
+        bookCol.appendChild(cardDiv);
+        parentRowDiv.appendChild(bookCol);
 
     }); 
 
@@ -311,7 +348,7 @@ function addToBorrowed(buttonClicked, destArray)
 {
     var alreadyBorrowed = 0;
     // check if book already in borrowed array
-    destArray[0].forEach((isbn, i) => {
+    destArray[0].forEach((isbn) => {
         if(isbn === buttonClicked.dataset.isbn)
         {
             // if found, set already borrowed to true
@@ -325,6 +362,9 @@ function addToBorrowed(buttonClicked, destArray)
         destArray[0].push(buttonClicked.dataset.isbn);
         destArray[1].push(buttonClicked.dataset.bookTitle);
         destArray[2].push(buttonClicked.dataset.author);
+        destArray[3].push(buttonClicked.dataset.genre);
+        // set checkout date
+        destArray[4].push(getRandomDate());
 
         // set the checkout status in browse array to 1, indicating checked out
         browse[checkoutRow][buttonClicked.dataset.arrayLocation] = 1;     
@@ -334,7 +374,7 @@ function addToBorrowed(buttonClicked, destArray)
 }
 
 // function to return a book
-function returnBook(buttonClicked, destArray)
+function returnBook(buttonClicked)
 {
     // get index in browse array of current book
     var browseIndex = browse[0].indexOf(buttonClicked.dataset.isbn);
@@ -348,7 +388,8 @@ function returnBook(buttonClicked, destArray)
     borrowed[0].splice(returnIndex, 1); 
     borrowed[1].splice(returnIndex, 1); 
     borrowed[2].splice(returnIndex, 1); 
-    borrowed[3].splice(returnIndex, 1); 
+    borrowed[3].splice(returnIndex, 1);
+    borrowed[4].splice(returnIndex, 1); 
 
     // save updated borrowed to local storage
     saveBorrowedBooks();
@@ -387,4 +428,17 @@ function loadBorrowedBooks() {
             browse[checkoutRow][location] = 1;
         });
     }
+}
+
+
+// function to generate a random date from a week ago to a week from now
+function getRandomDate() {
+    var now = new Date();
+    var oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
+    
+    // Get a random time in range
+    var randomTime = (now.getTime() - oneWeekInMs) + (Math.random() * (oneWeekInMs * 2));
+    
+    // return the date as a Date object
+    return new Date(randomTime); 
 }
