@@ -63,6 +63,12 @@ sortCollection(browse, currentSortOption);
 redrawBookArray(browse, browseDiv);
 redrawBookArray(borrowed, borrowedDiv);
 
+// event listener for toggle grid/list view
+const toggleViewButton = document.querySelector('#viewToggle');
+toggleViewButton.addEventListener('change', (event) => {
+    // value will be the string "grid" or "list"
+    var viewChoice = event.target.value;
+});
 
 // event listener for when sort selection updated
 const sortOption = document.querySelector('#sortSelect');
