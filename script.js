@@ -68,6 +68,17 @@ const toggleViewButton = document.querySelector('#viewToggle');
 toggleViewButton.addEventListener('change', (event) => {
     // value will be the string "grid" or "list"
     var viewChoice = event.target.value;
+
+    const browseRow = document.querySelector(".browseRow");
+    const borrowRow = document.querySelector(".borrowedRow");
+
+    if (viewChoice === "list") {
+        browseRow.classList.add('list-view');
+        borrowedRow.classList.add('list-view');
+    } else {
+        browseRow.classList.remove('list-view');
+        borrowedRow.classList.remove('list-view');
+    }
 });
 
 // event listener for when sort selection updated
@@ -96,7 +107,7 @@ searchBar.addEventListener('input', (event) => {
     const browseDivCards = browseDiv.querySelectorAll('.card');
     // loop through each card
     browseDivCards.forEach(card => {
-        const bookTitle = card.querySelector('.book_title');
+        const bookTitle = card.querySelector('.text_group .book_title');
         // find all book title divs
         if(bookTitle){
             // convert title to lowercase
@@ -106,7 +117,7 @@ searchBar.addEventListener('input', (event) => {
             var displayCard = titleText.includes(currentText);
 
             // target the col the card is contained in
-            const container = card.closest('.col'); 
+            const container = card.closest('.col-12, .col-md-4, .col-lg-3'); 
             // choose whether to show or hide card
             if(displayCard){
                 // force card to show up again when it matches search
@@ -245,6 +256,11 @@ function redrawBookArray(bookArray, parentRowDiv) {
         var borrowButton = document.createElement('button');
         // set up attributes for button to store
 
+        // Group text for styling purposes
+        var textGroup = document.createElement('div');
+        textGroup.classList.add('text_group');
+        textGroup.appendChild(titleDiv);
+        textGroup.appendChild(authorDiv);
         // I set the value and a separate dataset to isbn
         // I don't remember if both are used anymore
         borrowButton.value = isbn;
@@ -277,30 +293,35 @@ function redrawBookArray(bookArray, parentRowDiv) {
         }
         // if the array being drawn is borrowed books
         if(bookArray === borrowed)
-        {
-
+        {  
             borrowButton.innerText = "Return";
+
+
             // format due date and check for overdue
             var dueDateDiv = document.createElement('div');
+            // Style Due Date
+            dueDateDiv.classList.add('due_date', 'small', 'text-muted', 'card-text');
+        
             var returByDate = new Date(borrowed[4][i]);
             dueDateDiv.innerText = `Due Date: ${returByDate.toLocaleDateString('en-US')}`;
             var today = new Date();
             // if book overdue
             if(today > returByDate){
-            dueDateDiv.style.color = "red";
-            dueDateDiv.style.fontWeight = "bold";
+                dueDateDiv.classList.replace('text-muted', 'text-danger');
+                dueDateDiv.style.fontWeight = "bold";
             }
+
+
         }
 
 
         // set card to auto fit size to screen
-        bookCol.classList.add('col', 'col-auto');
         bookCol.classList.add('col-12', 'col-md-4', 'col-lg-3', 'mb-4');
 
         // append objects to create card
         cardDiv.appendChild(img);
-        cardDiv.appendChild(titleDiv);
-        cardDiv.appendChild(authorDiv);
+        cardDiv.appendChild(textGroup);
+        
         // only attempt to append due date if drawing borrowed array
         if(bookArray === borrowed)
         {cardDiv.appendChild(dueDateDiv);}

@@ -12,7 +12,7 @@
     border-radius: 10px;
 }
 
-.book_title, .book_author {
+.book_title, .book_author, .due_date{
     padding-left: 15px;
 }
 
@@ -37,3 +37,147 @@
     border: 2px solid lightgrey;
 }
 
+.col-md-auto .card-body {
+    margin-top: 0;
+}
+
+.card img {
+    transition: transform 0.3s ease;
+    z-index: 1;
+}
+
+.card:hover img {
+    transform: scale(1.1);
+    z-index: 2;
+}
+
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.due-date-text {
+    padding-left: 15px;
+    margin-bottom: 10px;
+
+}
+
+.list-view .col-12 {
+    width: 100%;
+}
+
+.list-view .card {
+    flex-direction: row !important; 
+    align-items: center;
+    padding: 10px;
+    height: auto !important;
+}
+
+.list-view .card img {
+    height: 80px !important; 
+    width: auto !important;
+    margin-right: 20px;
+}
+
+.text_group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* List view specific layout */
+.list-view .card {
+    flex-direction: row !important;
+    align-items: center;
+    padding: 10px;
+    height: auto !important;
+}
+
+.list-view .text_group {
+    flex-grow: 1; 
+    text-align: left;
+    margin-left: 20px;
+}
+
+.list-view .book_title {
+    margin-top: 0 !important; 
+    margin-bottom: 2px !important;
+    padding-left: 0 !important;
+}
+
+.list-view .book_author {
+    margin-bottom: 0 !important;
+    padding-left: 0 !important;
+}
+
+.list-view .borrow {
+    margin-top: 0 !important;
+    margin-left: 20px;
+    min-width: 120px;
+}
+
+.list-view .due_date {
+    order: 3;
+}
+
+.list-view .borrow {
+    margin-top: 0 !important;
+    max-width: 150px;
+}
+
+@media (max-width: 767px) {
+    #dashboard h2 {
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    .stats {
+        padding: 5px 10px;
+        text-align: center;
+    }
+
+    /* List View Mobile Layout */
+    .list-view .card {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important; /* This allows the due date to "drop" */
+        padding: 10px !important;
+        align-items: center !important;
+    }
+
+    .list-view .card img {
+        height: 50px !important;
+        width: 40px !important;
+        margin-right: 10px !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Corrected to text-group to match your likely JS */
+    .list-view .text_group {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        margin-right: 5px !important;
+    }
+
+    /* THE FIX: Force the due date to take up 100% width on mobile */
+    .list-view .due_date {
+        flex: 1 0 100% !important; /* Forces it to occupy its own line */
+        margin-top: 8px !important;
+        padding-top: 5px !important;
+        padding-left: 0 !important;
+        font-size: 0.7rem !important;
+        border-top: 1px solid rgba(0,0,0,0.05); /* Optional: subtle line */
+    }
+
+    .list-view .borrow {
+        width: 75px !important;
+        min-width: 75px !important;
+        font-size: 0.6rem !important;
+        margin-left: auto !important;
+        flex-shrink: 0 !important;
+    }
+}
