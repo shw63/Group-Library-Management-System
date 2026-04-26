@@ -158,11 +158,7 @@ borrowedDiv.addEventListener('click', (event) => {
     // Check if what was clicked is actually a borrow button
     if(event.target.classList.contains('borrow')) {
         console.log(`tried to return ${event.target}`)
-        var button = event.target;
-        var index = button.dataset.arrayLocation;
-        
-
-            
+ 
         returnBook(event.target, browse);
         redrawBookArray(borrowed, borrowedDiv);
         redrawBookArray(browse, browseDiv);
