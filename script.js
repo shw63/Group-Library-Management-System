@@ -107,7 +107,7 @@ searchBar.addEventListener('input', (event) => {
     const browseDivCards = browseDiv.querySelectorAll('.card');
     // loop through each card
     browseDivCards.forEach(card => {
-        const bookTitle = card.querySelector('.text_group .book_title');
+        const bookTitle = card.querySelector('.text_group');
         // find all book title divs
         if(bookTitle){
             // convert title to lowercase
